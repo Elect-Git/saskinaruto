@@ -12,8 +12,6 @@ $app = new Slim();
 $app->config('debug', true);
 
 $app->get('/', function() {
-
-	$sql = new Hcode\DB\Sql();
     
 	$page = new Page();
 
@@ -57,6 +55,64 @@ $app->get('/admin/logout', function(){
 
 	header("Location: /admin/login");
 	exit;
+
+});
+
+$app->get("/admin/users", function(){
+
+	User::verifyLogin();
+
+	$users = User::listAll();
+
+	$page = new PageAdmin();
+
+	$page->setTpl("users", array(
+		"users"=>$users
+	));
+
+});
+
+$app->get("/admin/users/create", function(){
+
+	User::verifyLogin();
+
+	$page = new PageAdmin();
+
+	$page->setTpl("users-create");
+
+});
+
+$app->get("/admin/users/:iduser/delete", function($iduser){//sempre colocar o delete antes das outras se nao ele nunca executara essa 
+
+	User::verifyLogin();
+
+});
+
+$app->get('/admin/users/:iduser', function($iduser){
+ 
+   User::verifyLogin();
+ 
+   $user = new User();
+ 
+   $user->get((int)$iduser);
+ 
+   $page = new PageAdmin();
+ 
+   $page ->setTpl("users-update", array(
+        "user"=>$user->getValues()
+    ));
+ 
+});
+
+$app->post("/admin/users/create", function(){
+
+	User::verifyLogin();
+
+});
+
+$app->post("/admin/users/:iduser", function($iduser){
+
+	User::verifyLogin();
 
 });
 
