@@ -9,7 +9,7 @@ use PHPMailer\PHPMailer\Exception;
 class Mailer{
 
 	const USERNAME = "testsaskinaruto@gmail.com";
-	const PASSWORD = "test123#";
+	const PASSWORD = "Bruno123123#";
 	const NAME_FROM = "Saskinaruto Store";
 
 	private $mail;
