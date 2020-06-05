@@ -12,6 +12,7 @@ class User extends Model{
 	const SECRET = "Saski_123_Secret";
 	const SECRET_IV = "Saski_123_Secret_IV";
 	const ERROR  = "UserERROR";
+	const ERROR_REGISTER = "UserErrorRegister";
 
 	public static function getFromSession()
 	{
@@ -365,6 +366,19 @@ class User extends Model{
 	{
 
 		$_SESSION[User::ERROR_REGISTER] = NULL;
+
+	}
+
+	public static function checkLoginExists($login)
+	{
+
+		$sql = new Sql();
+
+		$results = $sql->select("SELECT * FROM tb_users WHERE deslogin = :deslogin", [
+			':deslogin'=>$login
+		]);
+
+		return (count($results) > 0);
 
 	}
 
