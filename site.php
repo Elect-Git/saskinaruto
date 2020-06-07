@@ -63,7 +63,7 @@ $app->get("/products/:desurl", function($desurl){
 });
 $app->get("/cart", function(){
 
-	$cart = Cart::GetFromSession();
+	$cart = Cart::getFromSession();
 
 	$page = new Page();
 
@@ -81,7 +81,7 @@ $app->get("/cart/:idproduct/add", function($idproduct){
 
 	$product->get((int)$idproduct);
 
-	$cart = Cart::GetFromSession();
+	$cart = Cart::getFromSession();
 
 	$qtd = (isset($_GET['qtd'])) ? (int)$_GET['qtd'] : 1;
 
@@ -102,7 +102,7 @@ $app->get("/cart/:idproduct/minus", function($idproduct){
 
 	$product->get((int)$idproduct);
 
-	$cart = Cart::GetFromSession();
+	$cart = Cart::getFromSession();
 
 	$cart->removeProduct($product);
 
@@ -117,7 +117,7 @@ $app->get("/cart/:idproduct/remove", function($idproduct){
 
 	$product->get((int)$idproduct);
 
-	$cart = Cart::GetFromSession();
+	$cart = Cart::getFromSession();
 
 	$cart->removeProduct($product, true);
 
@@ -128,7 +128,7 @@ $app->get("/cart/:idproduct/remove", function($idproduct){
 
 $app->post("/cart/freight", function(){
 
-	$cart = Cart::GetFromSession();
+	$cart = Cart::getFromSession();
 
 	$cart->setFreight($_POST['zipcode']);
 
@@ -141,7 +141,7 @@ $app->get("/checkout", function (){
 
 	User::verifyLogin(false);
 
-	$cart = Cart::GetFromSession();
+	$cart = Cart::getFromSession();
 
 	$address = new Address();
 
@@ -306,5 +306,61 @@ $app->post("/forgot/reset", function(){
 	$page->setTpl("forgot-reset-success");
 
 });
+
+$app->get("/profile", function(){
+
+	User::verifyLogin(false);
+
+	$user = User::getFromSession();
+
+	$page = new Page();
+
+	$page->setTpl("profile", [
+		'user'=>$user->getValues(),
+		'profileMsg'=>User::getSuccess(),
+		'profileError'=>User::getError()
+	]);
+
+});
+
+$app->post("/profile", function(){
+
+	User::verifyLogin(false);
+
+	if (!isset($_POST['desperson']) || $_POST['desperson'] === ''){
+		User::setError("Preencha o seu nome.");
+		header('Location: /profile');
+		exit;
+	}
+
+	if (!isset($_POST['desemail']) || $_POST['desemail'] === ''){
+		User::setError("Preencha o seu email.");
+		header('Location: /profile');
+		exit;
+	}
+
+	$user = User::getFromSession();
+
+	if ($_POST['desemail'] !== $user->getdesemail()){
+		if (User::checkLoginExists($_POST['desemail']) === true){
+			User::setError("Este endereço de email já está cadastrado.");
+			header('Location: /profile');
+			exit;
+		}
+	}
+
+	$_POST['inadmin'] = $user->getinadmin();
+	$_POST['despassword'] = $user->getdespassword();
+	$_POST['deslogin'] = $_POST['desemail'];
+
+	$user->setData($_POST);
+
+	$user->save();
+
+	User::setSuccess("Dados alterados com sucesso!");
+
+	header('Location: /profile');
+	exit;
+})
 
  ?>
