@@ -4,9 +4,11 @@ namespace Hcode\Model;
 
 use \Hcode\DB\Sql;
 use \Hcode\Model;
+use \Hcode\Model\Order;
+use \Hcode\Model\OrderStatus;
 
 class Address extends Model{
-	
+
 	const SESSION_ERROR = "AddressError";
 
 	public static function getCEP($nrcep)
