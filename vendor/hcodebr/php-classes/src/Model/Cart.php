@@ -6,8 +6,6 @@ use \Hcode\DB\Sql;
 use \Hcode\Model;
 use \Hcode\Mailer;
 use \Hcode\Model\User;
-use \Hcode\Model\Category;
-use \Hcode\Model\Product;
 
 class Cart extends Model{
 
@@ -19,9 +17,8 @@ class Cart extends Model{
 
 		$cart = new Cart();
 
-		if(isset($_SESSION[Cart::SESSION]) && (int)$_SESSION[Cart::SESSION]['idcart']>0) {
+		if (isset($_SESSION[Cart::SESSION]) && (int)$_SESSION[Cart::SESSION]['idcart'] > 0) {
 			$cart->get((int)$_SESSION[Cart::SESSION]['idcart']);
-
 		} else {
 
 			$cart->getFromSessionID();
@@ -85,7 +82,11 @@ class Cart extends Model{
 			':idcart'=>$idcart
 		]);
 
-		$this->setData($results[0]);
+		if (count($results) > 0) {
+
+			$this->setData($results[0]);
+
+		}
 
 	}
 
@@ -175,7 +176,7 @@ class Cart extends Model{
 			SELECT SUM(vlprice) AS vlprice, SUM(vlwidth) AS vlwidth, SUM(vlheight) AS vlheight, SUM(vllength) AS vllength, SUM(vlweight) AS vlweight, COUNT(*) AS nrqtd
 			FROM tb_products a
 			INNER JOIN tb_cartsproducts b ON a.idproduct = b.idproduct
-			WHERE b.idcart = 1 AND dtremoved IS NULL;
+			WHERE b.idcart = :idcart AND dtremoved IS NULL;
 		", [
 			':idcart'=>$this->getidcart()
 		]);
@@ -197,9 +198,9 @@ class Cart extends Model{
 
 		if ($totals['nrqtd'] > 0){
 
-		if ($totals['vlheight'] < 2) $totals['vlheight'] = 2;
-        if ($totals['vllength'] < 16) $totals['vllength'] = 16;
-        if ($totals['vlwidth'] < 11) $totals['vlwidth'] = 11;
+			if ($totals['vlheight'] < 2) $totals['vlheight'] = 2;
+        	if ($totals['vllength'] < 16) $totals['vllength'] = 16;
+        	if ($totals['vlwidth'] < 11) $totals['vlwidth'] = 11;
 
 			$qs = http_build_query([
 				'nCdEmpresa'=>'',
@@ -256,7 +257,7 @@ class Cart extends Model{
 
 	}
 
-	public static function setMsgError()
+	public static function setMsgError($msg)
 	{
 
 		$_SESSION[Cart::SESSION_ERROR] = $msg;
