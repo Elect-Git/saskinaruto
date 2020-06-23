@@ -12,7 +12,7 @@ use \Hcode\Model\OrderStatus;
 $app->get('/', function() {
 
 	$products = Product::listAll();
-    
+
 	$page = new Page();
 
 	$page->setTpl("index", [
@@ -42,13 +42,14 @@ $app->get("/categories/:idcategory", function($idcategory){
 
 	$page = new Page();
 
-	$page->setTpl("category",[
+	$page->setTpl("category", [
 		'category'=>$category->getValues(),
 		'products'=>$pagination["data"],
 		'pages'=>$pages
 	]);
 
 });
+
 $app->get("/products/:desurl", function($desurl){
 
 	$product = new Product();
@@ -63,6 +64,7 @@ $app->get("/products/:desurl", function($desurl){
 	]);
 
 });
+
 $app->get("/cart", function(){
 
 	$cart = Cart::getFromSession();
@@ -147,7 +149,7 @@ $app->get("/checkout", function (){
 
 	$cart = Cart::getFromSession();
 
-	if (isset($_GET['zipcode'])) {
+	if (!isset($_GET['zipcode'])) {
 
 		$_GET['zipcode'] = $cart->getdeszipcode();
 
@@ -340,7 +342,7 @@ $app->post("/register", function(){
 
 	}
 
-	if (User::checkLoginExists($_POST['email']) === true){
+	if (User::checkLoginExist($_POST['email']) === true){
 
 		User::setErrorRegister("Este endereço de email já está cadastrado.");
 		header("Location: /login");
@@ -435,9 +437,6 @@ $app->get("/profile", function(){
 
     $page = new Page();
 
-    var_dump(User::getSuccess());
-    exit;
-
     $page->setTpl("profile",[
         'user'=>$user->getValues(),
         'profileMsg'=>User::getSuccess(),
@@ -464,7 +463,7 @@ $app->post("/profile", function(){
 	$user = User::getFromSession();
 
 	if ($_POST['desemail'] !== $user->getdesemail()){
-		if (User::checkLoginExists($_POST['desemail']) === true){
+		if (User::checkLoginExist($_POST['desemail']) === true){
 			User::setError("Este endereço de email já está cadastrado.");
 			header('Location: /profile');
 			exit;
@@ -501,7 +500,7 @@ $app->get("/order/:idorder", function($idorder){
 
 });
 
-$app->get("/boleto/:iduser", function($idorder){
+$app->get("/boleto/:idorder", function($idorder){
 
 	User::verifyLogin(false);
 
